@@ -18,6 +18,8 @@
 
 # Loading Packages
 import requests
+import seaborn as sns
+import matplotlib.pyplot as plt
 import pandas as pd
 from IPython.display import HTML
 import yaml
@@ -354,3 +356,140 @@ def style_and_render_df_with_hyperlinks(df):
     # Render to HTML
     rendered_html = styled_df.to_html(escape=False)
     display(HTML(rendered_html))
+
+def plot_triggered_events_admin0(data, season, severity):
+    """
+    Plots count of triggered events by year with 'Issue Month' and 'Frequency (%)' as hues.
+
+    Parameters:
+    - data: DataFrame containing 'Year', 'Issue Month', and 'Frequency (%)' columns.
+    - season (string): Target Season
+    - severity (string): Severity Level
+    """
+    
+    # Group the data by the 'Year' and count the number of triggered events
+    yearly_triggered_count = data.groupby(['Year']).size().reset_index(name='Count of Triggered')
+    
+    # Set up a figure with two subplots side by side
+    fig, axes = plt.subplots(1, 2, figsize=(18, 6))
+    
+    # Count plot with 'Issue Month' as the hue
+    sns.countplot(data=data, x='Year', hue='Issue Month', ax=axes[0], dodge=True)
+    axes[0].set_title(f'Triggered Events Frequency by Year and Issue Month - {season} {severity}')
+    axes[0].set_xlabel('Year')
+    axes[0].set_ylabel('Count of Triggered Events')
+    
+    # Count plot with 'Frequency (%)' as the hue
+    sns.countplot(data=data, x='Year', hue='Frequency (%)', ax=axes[1], dodge=True)
+    axes[1].set_title(f'Triggered Events Frequency by Year and Frequency (%) - {season} {severity}')
+    axes[1].set_xlabel('Year')
+    axes[1].set_ylabel('Count of Triggered Events')
+    
+    plt.tight_layout()  # Adjust the layout to make sure everything fits without overlapping
+    plt.show()
+
+def plot_triggered_events_heatmap_admin0(data, season, severity):
+    """
+    Plots a heatmap of triggered events summarized by frequency and issue month.
+
+    Parameters:
+    - data: DataFrame containing 'Frequency (%)', 'Issue Month', and count of triggered events.
+    - season (string): Target Season
+    - severity (string): Severity Level
+    """
+    # Summarize the counts by frequency and issue month
+    triggered_by_freq_month = data.groupby(['Frequency (%)', 'Issue Month']).size().unstack(fill_value=0)
+    
+    # Creating the heatmap
+    plt.figure(figsize=(10, 8))
+    heatmap = sns.heatmap(triggered_by_freq_month, annot=True, cmap="YlOrRd", fmt="d")
+    plt.title(f'Heatmap of Triggered Events - {season} {severity}')
+    plt.xlabel('Issue Month')
+    plt.ylabel('Frequency (%)')
+    
+    plt.show()
+    plt.clf()  # Clear the figure to avoid overlap in subsequent plots
+
+def plot_trigger_difference_boxplot_admin0(data, season, severity):
+    """
+    Plots a boxplot for the distribution of values in a specified column, including outliers and quartiles.
+
+    Parameters:
+    - data: DataFrame containing the data to plot.
+    - season (string): Target Season
+    - severity (string): Severity Level
+    """
+    plt.figure(figsize=(10, 6))
+    sns.boxplot(x=data['Trigger Difference'])
+    plt.title(f'Trigger Difference Boxplot - {season} {severity}')
+    plt.xlabel('Trigger Difference')
+    plt.grid(True)
+    plt.show
+    # Calculate and display the quantile ranges for Trigger Difference values for the current Admin Name
+    quantiles_admin = data['Trigger Difference'].quantile([0, 0.25, 0.5, 0.75, 1]).to_dict()
+    print(f"Quantile Ranges for Trigger Difference - {season} {severity} {quantiles_admin}")
+    print(quantiles_admin)
+    print("\n")
+
+def generate_heatmaps_for_admin1(data, season, severity):
+    """
+    Generates and optionally saves heatmaps for triggered events summarized by frequency and issue month for each administrative name.
+
+    Parameters:
+    - data: DataFrame containing the data.
+    - season (string): Target Season
+    - severity (string): Severity Level
+    """
+    # Filter for triggered events
+    triggered_events = data[data['Triggered']]
+
+    # Get unique admin names
+    admin_names = triggered_events['Admin Name'].unique()
+
+    for admin in admin_names:
+        # Filter the data for the current Admin Name
+        admin_triggered_events = triggered_events[triggered_events['Admin Name'] == admin]
+
+        # Summarize the counts by frequency and issue month
+        admin_triggered_by_freq_month = admin_triggered_events.groupby(['Frequency (%)', 'Issue Month']).size().unstack(fill_value=0)
+
+        # Generate and display the heatmap
+        plt.figure(figsize=(10, 6))
+        heatmap = sns.heatmap(admin_triggered_by_freq_month, annot=True, cmap="BuPu", fmt="d")
+        title = f'Heatmap of Triggered Events for {admin} - {season} {severity}'
+        plt.title(title)
+        plt.xlabel('Issue Month')
+        plt.ylabel('Frequency (%)')
+        plt.show()
+        plt.clf()  # Clear the figure for the next iteration
+
+def plot_boxplots_and_quantiles_admin1(data, season, severity):
+    """
+    Generates boxplots and displays quantile ranges for the Trigger Difference column for each value in the Admin column.
+
+    Parameters:
+    - data: DataFrame containing the data.
+    - season (string): Target Season
+    - severity (string): Severity Level
+    """
+    # Looping through each unique Admin Name
+    admin_names = data['Admin Name'].unique()
+    
+    for admin in admin_names:
+        # Filter the data for the current Admin Name
+        admin_data = data[data['Admin Name'] == admin]
+        
+        # Boxplot for Trigger Difference values for the current Admin Name
+        plt.figure(figsize=(10, 6))
+        sns.boxplot(x=admin_data['Trigger Difference'])
+        plt.title(f'Boxplot of Trigger Difference Values for {admin} - {season} {severity}')
+        plt.xlabel('Trigger Difference')
+        plt.grid(True)
+        plt.show()
+        
+        # Calculate and display the quantile ranges for Trigger Difference values for the current Admin Name
+        quantiles_admin = admin_data['Trigger Difference'].quantile([0, 0.25, 0.5, 0.75, 1]).to_dict()
+        print(f"Quantile Ranges for {admin}:")
+        print(quantiles_admin)
+        print("\n")
+
