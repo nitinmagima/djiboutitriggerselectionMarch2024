@@ -10,26 +10,34 @@ Version - 1.0
 The Jupyter Notebook aims to support the trigger selection analysis in Djibouti during the relevant seasons such as March-April-May (MAM), July-August-September (JAS), and October-November-December (OND).
 
 ### Audience
-Tailored for Djibouti government officials in agriculture, water resources, and disaster management sectors.
+Tailored for government officials in agriculture, water resources, and disaster management sectors.
 
 ### Objectives
 To provide an in-depth analysis of trigger selection during MAM, JAS, and OND using the Design Tool API.
 
 ### Summary
 
-The Jupyter Notebooks produces heatmaps and box plots for the respective seasons. For each season, it focuses on the high severity and moderate severity trigger levels and further divides for each severity at the national and regional levels. 
+The Jupyter Notebooks produces heatmaps, histograms and box plots for the respective seasons. For each season, it focuses on the high severity and moderate severity trigger levels and further divides for each severity at the national and regional levels. It also performs risk anaysis at the national and regional levels. 
 
 For each severity level during the stakeholder workshop, bad years highlighting years affected by drought were collected. Using these bad years and a range of frequencies ideally from 5 to 50, the Design Tool API pulls from the design tool and produces a table, with the data set description seen below. 
 
-The data is then filtered only for the years that have been triggered and a heatmap is produced. Looking at the heatmap, the user can decide what would be appropriate triggers for high severity at the national level, and similarly for the regional level for each season.  
+The data is filtered for the years that have not been triggered and a list is provided. The data is then filtered only for the years that have been triggered and a heatmap is produced. Looking at the heatmap, the user can decide what would be appropriate triggers for high severity at the national level, and similarly for the regional level for each season.  
 
-After that, if the user wants to decide what kind of threshold protocol should be used above which the forecast should be still triggered, the trigger difference have been shown here as a box plot and also as quantile data.
+After that, if the user wants to decide what kind of threshold protocol should be used above which the forecast should be still triggered, the trigger difference has been shown here as a box plot and also as quantile data.
 
+The Jupyter Notebooks then produces analysis to inform inform strategies for decision-makers with varying risk preferences using Expected Value (EV) and Risk-Adjusted Return on Prediction (RARoP).
+
+EV is calculated by assigning a value or cost to each type of decision outcome ('Worthy Action', 'Act in Vain', 'Worthy Inaction', and 'Fail to Act') and then summing these values, weighted by their probabilities. 
+
+Similar to the Sharpe Ratio in finance, RARoP involves adjusting the "return" (or benefit) of correct decisions ('Worthy Action' and 'Worthy Inaction') by the "volatility" (or uncertainty, represented by the proportion of incorrect decisions, 'Act in Vain' and 'Fail to Act') and the decision-maker's risk tolerance.
 
 Decision Maptools
 1. [OND season](https://iridl.ldeo.columbia.edu/fbfmaproom2/djibouti-ond)
 1. [JAS season](https://iridl.ldeo.columbia.edu/fbfmaproom2/djibouti)
 1. [MAM season](https://iridl.ldeo.columbia.edu/fbfmaproom2/djibouti-mam)
+
+IMPORTANT - DISCLAIMER AND RIGHTS STATEMENT
+This is a set of scripts written by the Financial Instruments Team at the International Research Institute for Climate and Society (IRI) part of The Columbia Climate School, Columbia University They are shared for educational purposes only.  Anyone who uses this code or its functionality or structure assumes full liability and should inform and credit IRI.
 
 
 ## YAML Description

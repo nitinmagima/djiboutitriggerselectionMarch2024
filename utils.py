@@ -39,10 +39,6 @@ def load_config(file_path="config.yaml"):
         config = yaml.safe_load(file)
     return config
 
-
-import requests
-import pandas as pd
-
 def get_data(maproom, mode, region, season, predictor, predictand, year, bad_years,
              issue_month0, freq, include_upcoming, threshold_protocol, username, password):
     """
@@ -493,3 +489,150 @@ def plot_boxplots_and_quantiles_admin1(data, season, severity):
         print(quantiles_admin)
         print("\n")
 
+def visualize_decision_outcomes(grouped_data):
+    """
+    Visualizes decision outcomes for each frequency across different administrative names
+    using a 2x2 grid of bar plots. Each subplot represents one of the outcomes:
+    'Worthy Action', 'Act in Vain', 'Worthy Inaction', 'Fail to Act'.
+    
+    Parameters:
+    - grouped_data: DataFrame containing the aggregated data to be visualized. 
+      It must include columns for 'Frequency (%)', 'Admin Name', and the outcomes 
+      ('Worthy Action', 'Act in Vain', 'Worthy Inaction', 'Fail to Act').
+    
+    Returns:
+    None. Displays a matplotlib figure with the plots.
+    """
+    # Define the outcomes to visualize
+    outcomes = ['Worthy Action', 'Act in Vain', 'Worthy Inaction', 'Fail to Act']
+
+    # Set up a 2x2 grid of subplots
+    fig, axes = plt.subplots(2, 2, figsize=(28, 12))  # Adjust the figsize as needed
+    axes = axes.flatten()  # Flatten the 2D array of axes to iterate over them
+
+    for i, outcome in enumerate(outcomes):
+        ax = axes[i]
+        sns.barplot(ax=ax, data=grouped_data, x='Frequency (%)', y=outcome, hue='Admin Name', errorbar=None)
+        ax.set_title(f'{outcome} by Frequency (%) and Admin Name')
+        ax.set_ylabel('Average Outcome')
+        ax.set_xlabel('Frequency (%)')
+        ax.tick_params(axis='x', rotation=45)
+        ax.legend(title='Admin Name', bbox_to_anchor=(1.05, 1), loc='upper left')
+
+    plt.tight_layout()
+    plt.show()
+
+def calculate_ev_rarop(dataframe, value_true_positive, cost_false_positive, value_true_negative, cost_false_negative, risk_tolerance):
+    """
+    Calculates the Expected Value (EV), normalizes it, computes the risk, and 
+    calculates the Risk-Adjusted Return on Prediction (RARoP) for each row in the dataframe.
+    
+    Parameters:
+    - dataframe: A pandas DataFrame with columns for 'Worthy Action', 'Act in Vain', 
+                 'Worthy Inaction', and 'Fail to Act'.
+    - value_true_positive: The value assigned to 'Worthy Action'.
+    - cost_false_positive: The cost assigned to 'Act in Vain'.
+    - value_true_negative: The value assigned to 'Worthy Inaction'.
+    - cost_false_negative: The cost assigned to 'Fail to Act'.
+    - risk_tolerance: A numeric value indicating the tolerance for risk.
+    
+    Returns:
+    - A modified DataFrame with additional columns for 'EV', 'EV_norm', 'Risk', and 'RARoP'.
+    """
+
+    # Calculate EV based on the provided values and costs
+    dataframe['EV'] = (
+        dataframe['Worthy Action'] * value_true_positive +
+        dataframe['Act in Vain'] * cost_false_positive +
+        dataframe['Worthy Inaction'] * value_true_negative +
+        dataframe['Fail to Act'] * cost_false_negative
+    )
+
+    # Normalize EV to a 0-1 scale
+    ev_min, ev_max = dataframe['EV'].min(), dataframe['EV'].max()
+    dataframe['EV_norm'] = (dataframe['EV'] - ev_min) / (ev_max - ev_min)
+
+    # Calculate Risk
+    dataframe['Risk'] = (dataframe['Act in Vain'] + dataframe['Fail to Act']) / (
+        dataframe['Worthy Action'] + dataframe['Act in Vain'] + dataframe['Worthy Inaction'] + dataframe['Fail to Act']
+    )
+
+    # Calculate RARoP based on EV_norm and Risk
+    def calculate_rarop(row):
+        if risk_tolerance > 0:
+            return row['EV_norm'] - (row['Risk'] / risk_tolerance)
+        else:
+            if row['Risk'] > 0:
+                return -10  # Penalty for risk when risk tolerance is 0
+            else:
+                return row['EV_norm']
+    
+    dataframe['RARoP'] = dataframe.apply(calculate_rarop, axis=1)
+    
+    return dataframe
+
+def visualize_ev_rarop_by_admin(grouped_data):
+    """
+    Visualizes the Expected Value (EV) and Risk-Adjusted Return on Prediction (RARoP)
+    for each administrative name in the provided dataset. The function creates separate
+    visualizations for each admin, displaying both the normalized EV and RARoP across
+    different frequencies.
+
+    Parameters:
+    - grouped_data: DataFrame containing the data to visualize. Must include
+      'Admin Name', 'Frequency (%)', 'EV_norm', and 'RARoP' columns.
+
+    Returns:
+    None. Displays matplotlib figures with the plots.
+    """
+    # Get unique admin names from the DataFrame
+    admin_names = grouped_data['Admin Name'].unique()
+
+    for admin in admin_names:
+        # Filter data for the current admin
+        admin_data = grouped_data[grouped_data['Admin Name'] == admin]
+        
+        # Create a single figure with two subplots (side by side)
+        fig, axes = plt.subplots(1, 2, figsize=(28, 6))  # Adjust the overall figsize as needed
+        
+        # Plot normalized Expected Value (EV) for the current admin on the first subplot
+        sns.barplot(ax=axes[0], data=admin_data, x='Frequency (%)', y='EV_norm', errorbar=None)
+        axes[0].set_title(f'Expected Value Normalized (EV) by Frequency (%) for {admin}')
+        axes[0].set_ylabel('Expected Value Normalized')
+        axes[0].set_xlabel('Frequency (%)')
+        axes[0].tick_params(axis='x', rotation=45)
+        
+        # Plot Risk-Adjusted Return on Prediction (RARoP) for the current admin on the second subplot
+        sns.barplot(ax=axes[1], data=admin_data, x='Frequency (%)', y='RARoP', errorbar=None)
+        axes[1].set_title(f'Risk-Adjusted Return on Prediction (RARoP) by Frequency (%) for {admin}')
+        axes[1].set_ylabel('RARoP')
+        axes[1].set_xlabel('Frequency (%)')
+        axes[1].tick_params(axis='x', rotation=45)
+        
+        # Adjust layout to ensure there's no overlapping content
+        plt.tight_layout()
+        plt.show()
+
+def generate_rarop_visualizations(dataframe, risk_tolerance_values, value_true_positive, cost_false_positive, value_true_negative, cost_false_negative):
+    """
+    Loops through given risk tolerance values, applies the calculate_ev_rarop function to calculate
+    EV, EV_norm, Risk, and RARoP for the dataframe, and then visualizes the results for each
+    administrative name using visualize_ev_rarop_by_admin function.
+
+    Parameters:
+    - dataframe: A pandas DataFrame with necessary columns for calculation and visualization.
+    - risk_tolerance_values: A list of numeric values indicating different levels of risk tolerance to iterate over.
+    - value_true_positive, cost_false_positive, value_true_negative, cost_false_negative: Numeric values used in the calculation of EV and RARoP.
+    
+    Returns:
+    None. The function directly displays visualizations.
+    """
+    for risk_tolerance in risk_tolerance_values:
+        # Calculate EV and RARoP for the current level of risk tolerance
+        updated_data = calculate_ev_rarop(dataframe.copy(), value_true_positive, cost_false_positive, value_true_negative, cost_false_negative, risk_tolerance)
+        
+        # Print the current risk tolerance value being processed
+        print(f"Visualizations for Risk Tolerance: {risk_tolerance}")
+        
+        # Visualize the results for each admin
+        visualize_ev_rarop_by_admin(updated_data)
