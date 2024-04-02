@@ -557,15 +557,20 @@ def calculate_ev_rarop(dataframe, value_true_positive, cost_false_positive, valu
         dataframe['Worthy Action'] + dataframe['Act in Vain'] + dataframe['Worthy Inaction'] + dataframe['Fail to Act']
     )
 
+    # Calculate Reward
+    dataframe['Reward'] = (dataframe['Worthy Action'] + dataframe['Worthy Inaction']) / (
+        dataframe['Worthy Action'] + dataframe['Act in Vain'] + dataframe['Worthy Inaction'] + dataframe['Fail to Act']
+    )
+
     # Calculate RARoP based on EV_norm and Risk
     def calculate_rarop(row):
-        if risk_tolerance > 0:
-            return row['EV_norm'] - (row['Risk'] / risk_tolerance)
+        if (risk_tolerance > 0) and (risk_tolerance <= 1):
+            return row['Reward'] - (row['Risk'] / risk_tolerance)
         else:
-            if row['Risk'] > 0:
-                return -10  # Penalty for risk when risk tolerance is 0
+            if risk_tolerance == 0:
+                return row['Reward'] - 10  # Penalty for risk when risk tolerance is 0
             else:
-                return row['EV_norm']
+                return print('risk_tolerance is not between 0 and 1')
     
     dataframe['RARoP'] = dataframe.apply(calculate_rarop, axis=1)
     

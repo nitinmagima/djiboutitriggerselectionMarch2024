@@ -17,7 +17,7 @@ To provide an in-depth analysis of trigger selection during MAM, JAS, and OND us
 
 ### Summary
 
-The Jupyter Notebooks produces heatmaps, histograms and box plots for the respective seasons. For each season, it focuses on the high severity and moderate severity trigger levels and further divides for each severity at the national and regional levels. It also performs risk anaysis at the national and regional levels. 
+The Jupyter Notebooks produces heatmaps, histograms, and box plots for the respective seasons. For each season, it focuses on the high severity and moderate severity trigger levels and further divides for each severity at the national and regional levels. It also performs risk analysis at the national and regional levels. 
 
 For each severity level during the stakeholder workshop, bad years highlighting years affected by drought were collected. Using these bad years and a range of frequencies ideally from 5 to 50, the Design Tool API pulls from the design tool and produces a table, with the data set description seen below. 
 
@@ -25,11 +25,11 @@ The data is filtered for the years that have not been triggered and a list is pr
 
 After that, if the user wants to decide what kind of threshold protocol should be used above which the forecast should be still triggered, the trigger difference has been shown here as a box plot and also as quantile data.
 
-The Jupyter Notebooks then produces analysis to inform inform strategies for decision-makers with varying risk preferences using Expected Value (EV) and Risk-Adjusted Return on Prediction (RARoP).
+The Jupyter Notebooks then produces analysis to inform strategies for decision-makers with varying risk preferences using Expected Value (EV) and Risk-Adjusted Return on Prediction (RARoP).
 
-EV is calculated by assigning a value or cost to each type of decision outcome ('Worthy Action', 'Act in Vain', 'Worthy Inaction', and 'Fail to Act') and then summing these values, weighted by their probabilities. 
+EV is calculated by assigning a value or cost to each type of decision outcome ('Worthy Action', 'Act in Vain', 'Worthy Inaction', and 'Fail to Act'). 
 
-Similar to the Sharpe Ratio in finance, RARoP involves adjusting the "return" (or benefit) of correct decisions ('Worthy Action' and 'Worthy Inaction') by the "volatility" (or uncertainty, represented by the proportion of incorrect decisions, 'Act in Vain' and 'Fail to Act') and the decision-maker's risk tolerance.
+RARoP involves adjusting the "return" (or benefit) of correct decisions ('Worthy Action' and 'Worthy Inaction') by the "volatility" (or uncertainty, represented by the proportion of incorrect decisions, 'Act in Vain' and 'Fail to Act') and the decision-maker's risk tolerance.
 
 Decision Maptools
 1. [OND season](https://iridl.ldeo.columbia.edu/fbfmaproom2/djibouti-ond)
