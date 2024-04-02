@@ -1,4 +1,4 @@
-# Trigger Selection Analysis - Djibouti 2024
+# Trigger Selection Analysis for Anticipatory Action (AA) - Djibouti 2024
 
 Author - Nitin Magima
 
@@ -7,7 +7,7 @@ Date - March 2024
 Version - 1.0
 
 ### Purpose
-The Jupyter Notebook aims to support the trigger selection analysis in Djibouti during the relevant seasons such as March-April-May (MAM), July-August-September (JAS), and October-November-December (OND).
+The Jupyter Notebook aims to support the AA trigger selection analysis in Djibouti during the relevant seasons such as March-April-May (MAM), July-August-September (JAS), and October-November-December (OND).
 
 ### Audience
 Tailored for government officials in agriculture, water resources, and disaster management sectors.
@@ -16,6 +16,20 @@ Tailored for government officials in agriculture, water resources, and disaster 
 To provide an in-depth analysis of trigger selection during MAM, JAS, and OND using the Design Tool API.
 
 ### Summary
+
+There are two questions that a decision-maker needs to keep in mind while picking triggers for different thresholds.
+
+- How often does the decision-maker want the AA mechanism to trigger?
+A decision-maker must decide how often the funds need to be disbursed and the size of the disbursement across the project's lifespan. For example, if a project is over ten years, funds can be disbursed from a $10 million fund in the following thresholds, depending on the frequency. 
+
+1 in 3 years (funds are possibly disbursed three times)
+1 in 5 years (funds are possibly disbursed two times)
+1 in 10 years (funds are possibly disbursed one time)
+
+During the deployment and monitoring of AA, a decision-maker should be aware that the trigger mechanism meeting the criteria is independent of the disbursement frequency. The frequency of triggers can be assessed on a month-to-month basis or year-to-year basis, depending on the stakeholders’ preferences. 
+
+- Does the threshold cover previous historical loss events or bad years considered important by the decision maker?
+Another factor to consider while defining the threshold is the historical loss events. Decision-makers use the historical loss events collected from research and stakeholder engagement. Historical loss events are gathered from relevant stakeholders through participatory processes. These events are then used to define different thresholds for drought severity and frequency. 
 
 The Jupyter Notebooks produces heatmaps, histograms, and box plots for the respective seasons. For each season, it focuses on the high severity and moderate severity trigger levels and further divides for each severity at the national and regional levels. It also performs risk analysis at the national and regional levels. 
 
@@ -30,6 +44,17 @@ The Jupyter Notebooks then produces analysis to inform strategies for decision-m
 EV is calculated by assigning a value or cost to each type of decision outcome ('Worthy Action', 'Act in Vain', 'Worthy Inaction', and 'Fail to Act'). 
 
 RARoP involves adjusting the "return" (or benefit) of correct decisions ('Worthy Action' and 'Worthy Inaction') by the "volatility" (or uncertainty, represented by the proportion of incorrect decisions, 'Act in Vain' and 'Fail to Act') and the decision-maker's risk tolerance.
+
+The Jupyter Notebook also analyzes and visualize three critical metrics—accuracy, sensitivity, and specificity—across different frequencies for each administrative name within a dataset. These metrics help evaluate the performance of the forecast for decision-making. Here's a summary of what each metric represents and how they are derived:
+
+Accuracy
+Accuracy measures the proportion of all predictions that the model got right; it's the most intuitive performance measure. It is calculated as the sum of true positives ('Worthy Action') and true negatives ('Worthy Inaction') divided by the total number of cases. This metric gives a general idea of the model's performance across both positive and negative classes but doesn't provide details on how it performs within each class.
+
+Sensitivity
+Sensitivity, also known as the True Positive Rate or Recall, measures the proportion of actual positives that are correctly identified by the model. It is calculated by dividing the number of true positives ('Worthy Action') by the sum of true positives and false negatives ('Fail to Act'). Sensitivity is crucial for cases where missing a positive case (e.g., failing to identify a disease in a patient) has significant consequences.
+
+Specificity
+Specificity, or the True Negative Rate, measures the proportion of actual negatives that are correctly identified by the model. It is calculated by dividing the number of true negatives ('Worthy Inaction') by the sum of true negatives and false positives ('Act in Vain'). Specificity is particularly important in situations where falsely identifying negatives as positives (e.g., falsely diagnosing a healthy person as sick) can lead to unnecessary anxiety or treatment.
 
 Decision Maptools
 1. [OND season](https://iridl.ldeo.columbia.edu/fbfmaproom2/djibouti-ond)

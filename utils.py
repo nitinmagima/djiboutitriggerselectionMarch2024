@@ -641,3 +641,52 @@ def generate_rarop_visualizations(dataframe, risk_tolerance_values, value_true_p
         
         # Visualize the results for each admin
         visualize_ev_rarop_by_admin(updated_data)
+
+def plot_metrics_by_admin_and_frequency(grouped_data):
+    """
+    For each unique 'Admin Name' in the DataFrame, calculates and plots accuracy, sensitivity, 
+    and specificity based on 'Worthy Action', 'Act in Vain', 'Worthy Inaction', and 'Fail to Act'
+    values against frequency.
+
+    Parameters:
+    - grouped_data: A pandas DataFrame expected to contain columns 'Admin Name', 'Frequency (%)',
+      'Worthy Action', 'Act in Vain', 'Worthy Inaction', and 'Fail to Act'.
+
+    Returns:
+    None. Displays a matplotlib graph for each 'Admin Name'.
+    """
+    # Get unique admin names from the DataFrame
+    admin_names = grouped_data['Admin Name'].unique()
+
+    for admin in admin_names:
+        # Filter data for the current admin
+        admin_data = grouped_data[grouped_data['Admin Name'] == admin]
+
+        # Calculate metrics for the filtered admin data
+        admin_data['Accuracy'] = (
+            (admin_data['Worthy Action'] + admin_data['Worthy Inaction']) / 
+            (admin_data['Worthy Action'] + admin_data['Act in Vain'] + admin_data['Worthy Inaction'] + admin_data['Fail to Act'])
+        )
+
+        admin_data['Sensitivity'] = (
+            admin_data['Worthy Action'] / 
+            (admin_data['Worthy Action'] + admin_data['Fail to Act'])
+        )
+
+        admin_data['Specificity'] = (
+            admin_data['Worthy Inaction'] / 
+            (admin_data['Worthy Inaction'] + admin_data['Act in Vain'])
+        )
+
+        # Plot the metrics for the current admin
+        plt.figure(figsize=(10, 6))
+        sns.lineplot(x='Frequency (%)', y='Accuracy', data=admin_data, marker='o', label='Accuracy')
+        sns.lineplot(x='Frequency (%)', y='Sensitivity', data=admin_data, marker='s', label='Sensitivity')
+        sns.lineplot(x='Frequency (%)', y='Specificity', data=admin_data, marker='^', label='Specificity')
+
+        plt.title(f'Metrics vs Frequency for {admin}')
+        plt.ylabel('Metric Value')
+        plt.xlabel('Frequency (%)')
+        plt.legend()
+        plt.tight_layout()
+        plt.show()
